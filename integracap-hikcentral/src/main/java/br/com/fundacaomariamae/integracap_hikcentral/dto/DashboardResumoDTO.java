@@ -1,4 +1,4 @@
-package br.com.fundacaomariamae.integracaphikcentral.dto;
+package br.com.fundacaomariamae.integracap_hikcentral.dto;
 
 public class DashboardResumoDTO {
 
