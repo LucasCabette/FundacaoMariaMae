@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal - Fundação Maria Mãe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="topo">
+        <div class="logo-area">
+            <img src="logo.svg" alt="Logo Fundação Maria Mãe" class="logo-img">
+            <span>Fundação Maria Mãe</span>
+        </div>
+        <div class="usuario-area">
+            <span>admin</span>
+            <span>|</span>
+            <button onclick="sair()">Sair</button>
+        </div>
+    </header>
+
+    <main class="menu-container">
+        <h1>O que você deseja fazer?</h1>
+
+        <div class="opcoes-menu">
+            <div class="opcao-card">
+                <div class="icone-opcao">🔎</div>
+                <h2>Consultar Cadastros</h2>
+                <p>Consulte as pessoas já cadastradas no sistema.</p>
+                <button class="botao-principal" onclick="consultarCadastros()">ACESSAR</button>
+            </div>
+
+            <div class="opcao-card">
+                <div class="icone-opcao">+</div>
+                <h2>Novo Cadastro</h2>
+                <p>Adicione uma nova pessoa ao sistema.</p>
+                <button class="botao-principal" onclick="novoCadastro()">ACESSAR</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

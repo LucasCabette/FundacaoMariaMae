@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Cadastro - Fundação Maria Mãe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="topo">
+        <div class="logo-area">
+            <img src="logo.svg" alt="Logo Fundação Maria Mãe" class="logo-img">
+            <span>Fundação Maria Mãe</span>
+        </div>
+        <div class="usuario-area">
+            <span>admin</span>
+            <span>|</span>
+            <button onclick="sair()">Sair</button>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div class="titulo-pagina">
+            <button class="btn-voltar" onclick="voltarMenu()" title="Voltar ao Menu">←</button>
+            <h1>Novo Cadastro</h1>
+        </div>
+
+        <p class="subtitulo-centralizado">Escolha como deseja realizar o cadastro:</p>
+
+        <div class="opcoes-menu mt-30">
+            <div class="opcao-card card-clicavel" onclick="escanearDocumento()">
+                <div class="icone-opcao">📷</div>
+                <h2>Escanear Documento</h2>
+                <p>Utilize a câmera para escanear o documento da pessoa.</p>
+            </div>
+
+            <div class="opcao-card card-clicavel" onclick="inserirManualmente()">
+                <div class="icone-opcao">👤<sup>+</sup></div>
+                <h2>Inserir Manualmente</h2>
+                <p>Preencha os dados da pessoa no formulário.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

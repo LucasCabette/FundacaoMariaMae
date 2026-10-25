@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pessoas Cadastradas - Fundação Maria Mãe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="topo">
+        <div class="logo-area">
+            <img src="logo.svg" alt="Logo Fundação Maria Mãe" class="logo-img">
+            <span>Fundação Maria Mãe</span>
+        </div>
+        <div class="usuario-area">
+            <span>admin</span>
+            <span>|</span>
+            <button onclick="sair()">Sair</button>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div class="titulo-pagina">
+            <button class="btn-voltar" onclick="voltarMenu()" title="Voltar ao Menu">←</button>
+            <h1>Pessoas Cadastradas</h1>
+        </div>
+
+        <div class="card-painel">
+            <form class="filtro-grid" onsubmit="event.preventDefault();">
+                <div class="campo">
+                    <label for="filtro-nome">Nome</label>
+                    <input type="text" id="filtro-nome" placeholder="Digite o nome...">
+                </div>
+                <div class="campo">
+                    <label for="filtro-cpf">CPF</label>
+                    <input type="text" id="filtro-cpf" placeholder="Digite o CPF...">
+                </div>
+                <div class="campo">
+                    <label for="filtro-id">ID</label>
+                    <input type="text" id="filtro-id" placeholder="Digite o ID...">
+                </div>
+                <div class="campo-btn-filtro">
+                    <button type="submit" class="botao-principal">🔍 Filtrar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-painel mt-20">
+            <div class="table-responsive">
+                <table class="tabela-dados">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>ID</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- As linhas serão inseridas dinamicamente pelo script.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="paginacao-container">
+                <span>Carregando registros...</span>
+                <div class="paginacao-botoes">
+                    <button class="btn-pag" disabled>&lt;</button>
+                    <button class="btn-pag active">1</button>
+                    <button class="btn-pag" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DE EDIÇÃO -->
+    <div id="modalEditar" class="modal-overlay" style="display: none;">
+        <div class="login-card modal-content">
+            <h2>Editar Assistido</h2>
+            <p class="subtitulo">Atualize as informações do cadastro</p>
+            
+            <form id="formEditarAssistido">
+                <input type="hidden" id="edit-id">
+                
+                <div class="campo">
+                    <label for="edit-nome">Nome Completo</label>
+                    <input type="text" id="edit-nome" required>
+                </div>
+
+                <div class="campo">
+                    <label for="edit-cpf">CPF</label>
+                    <input type="text" id="edit-cpf" placeholder="000.000.000-00">
+                </div>
+
+                <div class="campo">
+                    <label for="edit-codigo">Código / ID</label>
+                    <input type="text" id="edit-codigo" required>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="botao-principal">Salvar Alterações</button>
+                    <button type="button" class="botao-principal" onclick="fecharModalEditar()" style="background-color: var(--cor-texto-suave);">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalPrepararFoto" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="tituloPrepararFoto">
+        <div class="login-card modal-content modal-preparacao">
+            <h2 id="tituloPrepararFoto">Preparar foto</h2>
+            <p id="preparacao-assistido" class="subtitulo">Carregando cadastro...</p>
+            <p class="aviso-preparacao">A foto será validada e preparada. Esta etapa ainda não envia ao leitor facial.</p>
+            <form id="formPrepararFoto">
+                <div class="campo">
+                    <label for="preparacao-finalidade">Finalidade</label>
+                    <select id="preparacao-finalidade" required>
+                        <option value="CADASTRO">Preparar cadastro</option>
+                        <option value="ATUALIZACAO_FOTO">Preparar nova foto</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="preparacao-organizacao">Organização de destino</label>
+                    <input id="preparacao-organizacao" type="text" maxlength="128" required placeholder="Código da organização">
+                </div>
+                <div class="campo">
+                    <label for="preparacao-arquivo">Foto JPEG ou PNG</label>
+                    <input id="preparacao-arquivo" type="file" accept="image/jpeg,image/png" required aria-describedby="limite-foto">
+                    <small id="limite-foto">Use uma foto com até 1 MB.</small>
+                </div>
+                <img id="preparacao-previa" class="foto-previa" alt="Prévia da foto selecionada" hidden>
+                <div class="acoes-preparacao">
+                    <button id="preparacao-enviar" type="submit" class="botao-principal">Preparar foto</button>
+                    <button id="preparacao-fechar" type="button" class="botao-principal botao-secundario" onclick="fecharPreparacaoFoto()">Fechar</button>
+                </div>
+            </form>
+            <p id="preparacao-resultado" class="resultado-preparacao" role="status" aria-live="polite"></p>
+            <section class="historico-preparacao" aria-labelledby="tituloHistoricoPreparacao">
+                <div class="cabecalho-historico">
+                    <h3 id="tituloHistoricoPreparacao">Últimas 5 tentativas</h3>
+                    <button id="preparacao-atualizar" type="button" class="btn-acao" onclick="atualizarHistoricoPreparacao()">Atualizar</button>
+                </div>
+                <ul id="preparacao-historico" aria-live="polite"></ul>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="preparacao.js"></script>
+</body>
+</html>
