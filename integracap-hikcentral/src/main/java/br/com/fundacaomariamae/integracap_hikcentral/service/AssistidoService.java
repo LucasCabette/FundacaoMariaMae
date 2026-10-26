@@ -42,7 +42,7 @@ public class AssistidoService {
         a.setDataNascimento(request.dataNascimento());
         a.setNomeMae(request.nomeMae());
         a.setNomePai(request.nomePai());
-        a.setCpf(request.cpf());
+        a.setCpf(normalizarCpf(request.cpf()));
         a.setRg(request.rg());
         a.setCidadeNascimento(request.cidadeNascimento());
         a.setSexo(request.sexo());
@@ -101,4 +101,12 @@ public class AssistidoService {
         a.setStatus(StatusAssistido.INATIVO);
         repository.save(a);
     }
+
+private String normalizarCpf(String cpf) {
+    if (cpf == null || cpf.isBlank()) {
+        return null;
+    }
+
+    return cpf.replaceAll("\\D", "");
+}
 }
