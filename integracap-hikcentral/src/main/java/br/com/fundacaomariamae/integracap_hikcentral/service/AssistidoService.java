@@ -82,6 +82,16 @@ public class AssistidoService {
                 }
             });
         }
+if (repository.contarDuplicadosNaAtualizacao(
+        request.nome().trim(),
+        request.dataNascimento(),
+        id) > 0) {
+
+    throw new ResponseStatusException(
+        HttpStatus.CONFLICT,
+        "Já existe outro assistido com esse nome e data de nascimento."
+    );
+}
 
         a.setCodigoAssistido(request.codigoAssistido().trim());
         a.setNome(request.nome().trim());
