@@ -27,4 +27,16 @@ public interface AssistidoRepository extends JpaRepository<Assistido, Long> {
                   END = :nascimento
             """, nativeQuery = true)
     long existeNomeENascimentoNormalizado(@Param("nome") String nome, @Param("nascimento") String nascimento);
+
+@Query("""
+    SELECT COUNT(a) FROM Assistido a
+    WHERE lower(a.nome) = lower(:nome)
+      AND a.dataNascimento = :dataNascimento
+      AND a.id <> :id
+    """)
+long contarDuplicadosNaAtualizacao(
+    @Param("nome") String nome,
+    @Param("dataNascimento") LocalDate dataNascimento,
+    @Param("id") Long id
+);
 }
