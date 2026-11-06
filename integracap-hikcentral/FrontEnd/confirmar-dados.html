@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferir Dados e Capturar Foto - Fundação Maria Mãe</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container-captura {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f8faf9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--cor-borda);
+        }
+        #video-webcam, #foto-canvas-preview {
+            width: 100%;
+            max-width: 320px;
+            height: 240px;
+            background-color: #203f2e;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .botoes-camera {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topo">
+        <div class="logo-area">
+            <img src="logo.jpeg" alt="Logo Fundação Maria Mãe" class="logo-img">
+            <span>Fundação Maria Mãe</span>
+        </div>
+        <div class="usuario-area">
+            <span>admin</span>
+            <span>|</span>
+            <button onclick="sair()">Sair</button>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div class="titulo-pagina">
+            <button class="btn-voltar" onclick="window.location.href='novo-cadastro.html'" title="Voltar">←</button>
+            <h1>Conferir Dados e Capturar Foto</h1>
+        </div>
+
+        <div class="card-painel" style="max-width: 750px; margin: 0 auto;">
+            
+            <!-- CAPTURA DA FOTO DO ASSISTIDO -->
+            <div class="container-captura">
+                <h3>Foto do Assistido</h3>
+                <video id="video-webcam" autoplay playsinline></video>
+                <canvas id="foto-canvas" style="display:none;"></canvas>
+                <img id="foto-preview" style="display:none;" class="foto-previa" alt="Foto capturada">
+
+                <div class="botoes-camera">
+                    <button type="button" id="btn-iniciar-cam" class="botao-principal" onclick="iniciarCamera()" style="width: auto;">📷 Abrir Câmera</button>
+                    <button type="button" id="btn-tirar-foto" class="botao-principal" onclick="capturarFoto()" style="width: auto; display:none;">📸 Tirar Foto</button>
+                    <button type="button" id="btn-recapturar" class="botao-principal botao-secundario" onclick="recapturarFoto()" style="width: auto; display:none;">🔄 Nova Foto</button>
+                </div>
+                
+                <div style="font-size: 13px; color: var(--cor-texto-suave);">Ou escolha um arquivo:</div>
+                <input type="file" id="arquivo-foto" accept="image/*" onchange="carregarFotoArquivo(event)">
+            </div>
+
+            <!-- FORMULÁRIO DE CONFERÊNCIA -->
+            <form id="formConfirmarCadastro">
+                <div class="campo">
+                    <label for="conf-codigo">Código do Assistido *</label>
+                    <input type="text" id="conf-codigo" required>
+                </div>
+
+                <div class="campo">
+                    <label for="conf-nome">Nome Completo *</label>
+                    <input type="text" id="conf-nome" required>
+                </div>
+
+                <div class="campo">
+                    <label for="conf-nascimento">Data de Nascimento *</label>
+                    <input type="date" id="conf-nascimento" required>
+                </div>
+
+                <div class="campo">
+                    <label for="conf-cpf">CPF (somente números)</label>
+                    <input type="text" id="conf-cpf" maxlength="11">
+                </div>
+
+                <div class="campo">
+                    <label for="conf-rg">RG</label>
+                    <input type="text" id="conf-rg">
+                </div>
+
+                <div class="campo">
+                    <label for="conf-mae">Nome da Mãe</label>
+                    <input type="text" id="conf-mae">
+                </div>
+
+                <div class="campo">
+                    <label for="conf-pai">Nome do Pai</label>
+                    <input type="text" id="conf-pai">
+                </div>
+
+                <div class="campo">
+                    <label for="conf-cidade">Cidade de Nascimento</label>
+                    <input type="text" id="conf-cidade">
+                </div>
+
+                <div class="campo">
+                    <label for="conf-sexo">Sexo</label>
+                    <select id="conf-sexo" style="width: 100%; height: 42px; padding: 0 14px; border: 1px solid var(--cor-borda); border-radius: 5px;">
+                        <option value="">Selecione...</option>
+                        <option value="MASCULINO">Masculino</option>
+                        <option value="FEMININO">Feminino</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button type="submit" class="botao-principal">Finalizar Cadastro</button>
+                    <button type="button" class="botao-principal" onclick="window.location.href='novo-cadastro.html'" style="background-color: var(--cor-texto-suave);">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        let streamCamera = null;
+        let fotoCapturadaBase64 = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const dadosSalvos = sessionStorage.getItem("dadosAssistidoTemp");
+            if (dadosSalvos) {
+                const dados = JSON.parse(dadosSalvos);
+                document.getElementById("conf-codigo").value = dados.codigoAssistido || "";
+                document.getElementById("conf-nome").value = dados.nome || "";
+                document.getElementById("conf-nascimento").value = dados.dataNascimento || "";
+                document.getElementById("conf-cpf").value = dados.cpf || "";
+                document.getElementById("conf-rg").value = dados.rg || "";
+                document.getElementById("conf-mae").value = dados.nomeMae || "";
+                document.getElementById("conf-pai").value = dados.nomePai || "";
+                document.getElementById("conf-cidade").value = dados.cidadeNascimento || "";
+                document.getElementById("conf-sexo").value = dados.sexo || "";
+            }
+        });
+
+        async function iniciarCamera() {
+            try {
+                streamCamera = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById("video-webcam");
+                video.srcObject = streamCamera;
+                video.style.display = "block";
+                document.getElementById("foto-preview").style.display = "none";
+                document.getElementById("btn-iniciar-cam").style.display = "none";
+                document.getElementById("btn-tirar-foto").style.display = "inline-flex";
+            } catch (err) {
+                alert("Não foi possível acessar a câmera do dispositivo.");
+            }
+        }
+
+        function capturarFoto() {
+            const video = document.getElementById("video-webcam");
+            const canvas = document.getElementById("foto-canvas");
+            const preview = document.getElementById("foto-preview");
+
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 240;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            fotoCapturadaBase64 = canvas.toDataURL("image/jpeg");
+            preview.src = fotoCapturadaBase64;
+            preview.style.display = "block";
+            video.style.display = "none";
+
+            if (streamCamera) {
+                streamCamera.getTracks().forEach(track => track.stop());
+            }
+
+            document.getElementById("btn-tirar-foto").style.display = "none";
+            document.getElementById("btn-recapturar").style.display = "inline-flex";
+        }
+
+        function recapturarFoto() {
+            fotoCapturadaBase64 = null;
+            document.getElementById("btn-recapturar").style.display = "none";
+            iniciarCamera();
+        }
+
+        function carregarFotoArquivo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoCapturadaBase64 = e.target.result;
+                    const preview = document.getElementById("foto-preview");
+                    preview.src = fotoCapturadaBase64;
+                    preview.style.display = "block";
+                    document.getElementById("video-webcam").style.display = "none";
+                    document.getElementById("btn-iniciar-cam").style.display = "inline-flex";
+                    document.getElementById("btn-tirar-foto").style.display = "none";
+                    document.getElementById("btn-recapturar").style.display = "none";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById("formConfirmarCadastro").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const payload = {
+                codigoAssistido: document.getElementById("conf-codigo").value.trim(),
+                nome: document.getElementById("conf-nome").value.trim(),
+                dataNascimento: document.getElementById("conf-nascimento").value,
+                cpf: document.getElementById("conf-cpf").value.trim() || null,
+                rg: document.getElementById("conf-rg").value.trim() || null,
+                nomeMae: document.getElementById("conf-mae").value.trim() || null,
+                nomePai: document.getElementById("conf-pai").value.trim() || null,
+                cidadeNascimento: document.getElementById("conf-cidade").value.trim() || null,
+                sexo: document.getElementById("conf-sexo").value || null,
+                fotoBase64: fotoCapturadaBase64
+            };
+
+            try {
+                await consultarApi(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                sessionStorage.removeItem("dadosAssistidoTemp");
+                alert("Assistido cadastrado com sucesso!");
+                window.location.href = "pessoas.html";
+            } catch (error) {
+                alert(`Erro ao salvar cadastro: ${error.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
