@@ -1,0 +1,145 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------< br.com.fundacaomariamae:integracap-hikcentral >------------
+[INFO] Building integracap-hikcentral 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ integracap-hikcentral ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ integracap-hikcentral ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 26 source files with javac [debug parameters release 21] to target\classes
+[INFO] /C:/Users/Lucas/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an/outputs/integracap-hikcentral-integrado-ajustado/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/ConsultaCadastroIntegracaoService.java: C:\Users\Lucas\Documents\Codex\2026-10-11\referenced-chatgpt-conversation-this-is-an\outputs\integracap-hikcentral-integrado-ajustado\integracap-hikcentral\src\main\java\br\com\fundacaomariamae\integracap_hikcentral\service\ConsultaCadastroIntegracaoService.java uses or overrides a deprecated API.
+[INFO] /C:/Users/Lucas/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an/outputs/integracap-hikcentral-integrado-ajustado/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/ConsultaCadastroIntegracaoService.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ integracap-hikcentral ---
+[INFO] skip non existing resourceDirectory C:\Users\Lucas\Documents\Codex\2026-10-11\referenced-chatgpt-conversation-this-is-an\outputs\integracap-hikcentral-integrado-ajustado\integracap-hikcentral\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ integracap-hikcentral ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target\test-classes
+[INFO] /C:/Users/Lucas/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an/outputs/integracap-hikcentral-integrado-ajustado/integracap-hikcentral/src/test/java/br/com/fundacaomariamae/integracap_hikcentral/PreparacaoAssistidoSalvoTests.java: C:\Users\Lucas\Documents\Codex\2026-10-11\referenced-chatgpt-conversation-this-is-an\outputs\integracap-hikcentral-integrado-ajustado\integracap-hikcentral\src\test\java\br\com\fundacaomariamae\integracap_hikcentral\PreparacaoAssistidoSalvoTests.java uses or overrides a deprecated API.
+[INFO] /C:/Users/Lucas/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an/outputs/integracap-hikcentral-integrado-ajustado/integracap-hikcentral/src/test/java/br/com/fundacaomariamae/integracap_hikcentral/PreparacaoAssistidoSalvoTests.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ integracap-hikcentral ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplicationTests
+13:45:33.701 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplicationTests]: IntegracapHikcentralApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:45:33.809 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplication for test class br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplicationTests
+13:45:33.903 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplicationTests]: IntegracapHikcentralApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:45:33.905 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplication for test class br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-24T13:45:34.209-03:00  INFO 22052 --- [integracap-hikcentral] [           main] f.i.IntegracapHikcentralApplicationTests : Starting IntegracapHikcentralApplicationTests using Java 25.0.3 with PID 22052 (started by Lucas in C:\Users\Lucas\Documents\Codex\2026-10-11\referenced-chatgpt-conversation-this-is-an\outputs\integracap-hikcentral-integrado-ajustado\integracap-hikcentral)
+2026-10-24T13:45:34.210-03:00  INFO 22052 --- [integracap-hikcentral] [           main] f.i.IntegracapHikcentralApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2026-10-24T13:45:34.838-03:00  INFO 22052 --- [integracap-hikcentral] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-24T13:45:34.891-03:00  INFO 22052 --- [integracap-hikcentral] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 44 ms. Found 1 JPA repository interface.
+2026-10-24T13:45:35.265-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-24T13:45:35.330-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-24T13:45:35.857-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-24T13:45:35.897-03:00  INFO 22052 --- [integracap-hikcentral] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.sqlite.SQLiteJDBCLoader in an unnamed module (file:/C:/Users/Lucas/.m2/repository/org/xerial/sqlite-jdbc/3.49.1.0/sqlite-jdbc-3.49.1.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-10-24T13:45:36.007-03:00  INFO 22052 --- [integracap-hikcentral] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.sqlite.jdbc4.JDBC4Connection@420b55ed
+2026-10-24T13:45:36.009-03:00  INFO 22052 --- [integracap-hikcentral] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-24T13:45:36.050-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:./data/fundacao_maria_mae.sqlite]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.49.1
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-24T13:45:36.826-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-24T13:45:36.834-03:00  INFO 22052 --- [integracap-hikcentral] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-24T13:45:36.916-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-24T13:45:37.630-03:00  INFO 22052 --- [integracap-hikcentral] [           main] f.i.IntegracapHikcentralApplicationTests : Started IntegracapHikcentralApplicationTests in 3.659 seconds (process running for 4.694)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (C:\Users\Lucas\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.436 s -- in br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplicationTests
+[INFO] Running br.com.fundacaomariamae.integracap_hikcentral.PreparacaoAssistidoSalvoTests
+2026-10-24T13:45:37.964-03:00  INFO 22052 --- [integracap-hikcentral] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [br.com.fundacaomariamae.integracap_hikcentral.PreparacaoAssistidoSalvoTests]: PreparacaoAssistidoSalvoTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T13:45:37.967-03:00  INFO 22052 --- [integracap-hikcentral] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplication for test class br.com.fundacaomariamae.integracap_hikcentral.PreparacaoAssistidoSalvoTests
+2026-10-24T13:45:37.968-03:00  INFO 22052 --- [integracap-hikcentral] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [br.com.fundacaomariamae.integracap_hikcentral.PreparacaoAssistidoSalvoTests]: PreparacaoAssistidoSalvoTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-24T13:45:37.969-03:00  INFO 22052 --- [integracap-hikcentral] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration br.com.fundacaomariamae.integracap_hikcentral.IntegracapHikcentralApplication for test class br.com.fundacaomariamae.integracap_hikcentral.PreparacaoAssistidoSalvoTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-24T13:45:38.027-03:00  INFO 22052 --- [integracap-hikcentral] [           main] b.c.f.i.PreparacaoAssistidoSalvoTests    : Starting PreparacaoAssistidoSalvoTests using Java 25.0.3 with PID 22052 (started by Lucas in C:\Users\Lucas\Documents\Codex\2026-10-11\referenced-chatgpt-conversation-this-is-an\outputs\integracap-hikcentral-integrado-ajustado\integracap-hikcentral)
+2026-10-24T13:45:38.027-03:00  INFO 22052 --- [integracap-hikcentral] [           main] b.c.f.i.PreparacaoAssistidoSalvoTests    : No active profile set, falling back to 1 default profile: "default"
+2026-10-24T13:45:38.197-03:00  INFO 22052 --- [integracap-hikcentral] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-24T13:45:38.209-03:00  INFO 22052 --- [integracap-hikcentral] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 1 JPA repository interface.
+2026-10-24T13:45:38.374-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-24T13:45:38.388-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-24T13:45:38.388-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-24T13:45:38.443-03:00  INFO 22052 --- [integracap-hikcentral] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 413 ms
+2026-10-24T13:45:38.510-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-24T13:45:38.546-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-24T13:45:38.549-03:00  INFO 22052 --- [integracap-hikcentral] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-24T13:45:38.553-03:00  INFO 22052 --- [integracap-hikcentral] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.sqlite.jdbc4.JDBC4Connection@7e147828
+2026-10-24T13:45:38.553-03:00  INFO 22052 --- [integracap-hikcentral] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-24T13:45:38.554-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:C:\Users\Lucas\Documents\Codex\2026-10-11\referenced-chatgpt-conversation-this-is-an\outputs\integracap-hikcentral-integrado-ajustado\integracap-hikcentral\target\passo1-14210611717361541885\teste.sqlite]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.49.1
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-24T13:45:38.589-03:00  INFO 22052 --- [integracap-hikcentral] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-24T13:45:38.591-03:00  INFO 22052 --- [integracap-hikcentral] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-24T13:45:38.709-03:00  INFO 22052 --- [integracap-hikcentral] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 51863 (http) with context path '/'
+2026-10-24T13:45:38.711-03:00  INFO 22052 --- [integracap-hikcentral] [           main] b.c.f.i.PreparacaoAssistidoSalvoTests    : Started PreparacaoAssistidoSalvoTests in 0.716 seconds (process running for 5.775)
+2026-10-24T13:45:38.917-03:00  INFO 22052 --- [integracap-hikcentral] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-24T13:45:38.917-03:00  INFO 22052 --- [integracap-hikcentral] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-24T13:45:38.918-03:00  INFO 22052 --- [integracap-hikcentral] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-24T13:45:39.290-03:00  WARN 22052 --- [integracap-hikcentral] [o-auto-1-exec-7] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.multipart.support.MissingServletRequestPartException: Required part 'foto' is not present.]
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.421 s -- in br.com.fundacaomariamae.integracap_hikcentral.PreparacaoAssistidoSalvoTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.921 s
+[INFO] Finished at: 2026-10-24T13:45:39-03:00
+[INFO] ------------------------------------------------------------------------
