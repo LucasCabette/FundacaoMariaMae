@@ -3,6 +3,7 @@ package br.com.fundacaomariamae.integracap_hikcentral.controller;
 import br.com.fundacaomariamae.integracap_hikcentral.dto.AssistidoRequest;
 import br.com.fundacaomariamae.integracap_hikcentral.dto.AssistidoResponse;
 import br.com.fundacaomariamae.integracap_hikcentral.service.AssistidoService;
+import br.com.fundacaomariamae.integracap_hikcentral.service.HikCentralSyncService;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,15 +16,18 @@ import java.util.List;
 @RequestMapping("/api/assistidos")
 public class AssistidoController {
     private final AssistidoService service;
+    private final HikCentralSyncService hikCentralSync;
 
-    public AssistidoController(AssistidoService service) {
+    public AssistidoController(AssistidoService service, HikCentralSyncService hikCentralSync) {
         this.service = service;
+        this.hikCentralSync = hikCentralSync;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AssistidoResponse cadastrar(@Valid @RequestBody AssistidoRequest request) {
-        return service.cadastrar(request);
+        AssistidoResponse salvo = service.cadastrar(request);
+        return hikCentralSync.sincronizarNovoCadastro(salvo, request.fotoBase64());
     }
 
     @GetMapping
@@ -39,7 +43,8 @@ public class AssistidoController {
     @PutMapping("/{id}")
     public AssistidoResponse atualizar(@PathVariable Long id,
                                         @Valid @RequestBody AssistidoRequest request) {
-        return service.atualizar(id, request);
+        AssistidoResponse salvo = service.atualizar(id, request);
+        return hikCentralSync.sincronizarEdicao(salvo);
     }
 
     @DeleteMapping("/{id}")

@@ -230,13 +230,17 @@
             };
 
             try {
-                await consultarApi(API_URL, {
+                const resposta = await consultarApi(API_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
+                const resultado = await resposta.json();
                 sessionStorage.removeItem("dadosAssistidoTemp");
-                alert("Assistido cadastrado com sucesso!");
+                const situacao = resultado.hikCentralSyncMessage
+                    ? `\n\nHikCentral (${resultado.hikCentralSyncStatus}): ${resultado.hikCentralSyncMessage}`
+                    : "";
+                alert(`Assistido cadastrado localmente.${situacao}`);
                 window.location.href = "pessoas.html";
             } catch (error) {
                 alert(`Erro ao salvar cadastro: ${error.message}`);

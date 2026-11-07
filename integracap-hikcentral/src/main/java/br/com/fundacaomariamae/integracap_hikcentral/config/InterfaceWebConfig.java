@@ -2,11 +2,13 @@ package br.com.fundacaomariamae.integracap_hikcentral.config;
 
 import java.nio.file.Path;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /** Serve as telas existentes pela mesma origem da API, sem mover a pasta FrontEnd. */
 @Configuration
+@EnableConfigurationProperties(HikCentralProperties.class)
 public class InterfaceWebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

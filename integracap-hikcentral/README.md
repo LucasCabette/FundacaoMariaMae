@@ -1,6 +1,6 @@
 # Fundação Maria Mãe
 
-Aplicação de apoio ao cadastro de assistidos e à preparação de dados e fotos para futura integração com o HikCentral. Reúne backend Java/Spring Boot, banco SQLite e interface web.
+Aplicação de apoio ao cadastro de assistidos e à sincronização configurável de dados e fotos com o HikCentral. Reúne backend Java/Spring Boot, banco SQLite e interface web.
 
 ## Executar
 
@@ -98,6 +98,23 @@ A lista mostra até 50 tentativas, das mais recentes para as mais antigas. O par
 
 Não existe reenvio automático nem fila. Para tentar outra vez, selecione/envie a foto novamente. Uma interrupção do processo pode deixar a tentativa em `EM_PREPARACAO`. Se o banco estiver indisponível, não é possível garantir o registro da falha.
 
+## Sincronização de novos cadastros com o HikCentral
+
+O envio pela OpenAPI é opcional e vem desabilitado. Para habilitá-lo no ambiente da Fundação, configure estas variáveis no processo que inicia a aplicação:
+
+```text
+HIKCENTRAL_ENABLED=true
+HIKCENTRAL_BASE_URL=https://servidor-hikcentral:443
+HIKCENTRAL_API_KEY=chave-fornecida-pelo-administrador
+HIKCENTRAL_API_SECRET=segredo-fornecido-pelo-administrador
+HIKCENTRAL_ORG_INDEX_CODE=codigo-da-organizacao-no-hikcentral
+HIKCENTRAL_PRIVILEGE_GROUP_ID=grupo-de-acesso-se-for-necessario
+```
+
+Não grave chaves no repositório. No cadastro feito pela tela de confirmação, a foto selecionada/capturada segue junto com os dados. Depois de salvar localmente, o backend procura a pessoa pelo código do assistido; cria ou atualiza o registro no HikCentral e envia a foto facial. Edições de dados cadastrais também são enviadas ao registro remoto existente; a tela de edição não troca a foto facial. A resposta informa `hikCentralSyncStatus` e `hikCentralSyncMessage`. Sem foto no novo cadastro, o cadastro local é mantido e a sincronização fica como `PENDENTE_FOTO`. Falhas remotas também não apagam o cadastro local.
+
+O contrato inicial usa os endpoints Artemis de consulta por código, inclusão/edição de pessoa, atualização facial e, quando configurado, atribuição a um grupo de acesso. Se a política existente no HikCentral já atribui acesso automaticamente pela organização/grupo de pessoas, deixe `HIKCENTRAL_PRIVILEGE_GROUP_ID` vazio; a resposta avisará que essa atribuição deve ser confirmada. A URL, as credenciais, os códigos de organização/grupo, a assinatura HTTPS e os campos aceitos ainda precisam ser confirmados contra a OpenAPI instalada na Fundação. Este fluxo não configura regras locais do leitor.
+
 ## Organização do código
 
 ```text
@@ -140,7 +157,7 @@ O fluxo da interface também foi conferido em navegador real com banco temporár
 - O formulário de inserção manual e o OCR continuam em desenvolvimento.
 - Relatórios e dashboard possuem rotas demonstrativas; não representam uma consolidação completa do banco.
 - A preparação não valida a qualidade biométrica de um rosto nem identifica duplicidade facial.
-- A comunicação real, assinatura das chamadas, distribuição dos cadastros ao leitor e homologação com o HikCentral estão pendentes do contrato e das configurações da instalação.
+- O envio via OpenAPI está implementado como primeira versão, mas endereço, assinatura, mapeamento de campos, permissão e chegada ao leitor ainda precisam ser configurados e homologados no ambiente da Fundação.
 - O anti-passback já utilizado na Fundação não foi reimplementado.
 
 Use dados fictícios nas verificações locais. A versão informada para o Web Client é HikCentral Professional **3.0.1.20250828**; ela não confirma a versão do componente OpenAPI instalado.

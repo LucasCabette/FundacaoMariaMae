@@ -337,23 +337,34 @@ document.addEventListener("DOMContentLoaded", () => {
         const botao = formEditar.querySelector('button[type="submit"]');
         if (botao) botao.disabled = true;
 
+        let resultadoEdicao = null;
         try {
-            await consultarApi(`${API_URL}/${id}`, {
+            const response = await consultarApi(`${API_URL}/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dadosAtualizados)
             });
+            resultadoEdicao = await response.json();
         } catch (error) {
             // Atualiza na memória local fictícia para testes offline
             const idx = assistidosFicticios.findIndex(a => a.id === Number(id));
-            if (idx !== -1) {
-                assistidosFicticios[idx] = { ...assistidosFicticios[idx], ...dadosAtualizados };
+            if (idx === -1) {
+                alert(`Não foi possível salvar a edição: ${error.message}`);
+                return;
             }
+            assistidosFicticios[idx] = { ...assistidosFicticios[idx], ...dadosAtualizados };
+            resultadoEdicao = {
+                hikCentralSyncStatus: "SIMULADO",
+                hikCentralSyncMessage: "Alteração mantida apenas nos dados fictícios desta tela."
+            };
         } finally {
             if (botao) botao.disabled = false;
         }
 
-        alert("Cadastro atualizado com sucesso!");
+        const situacao = resultadoEdicao?.hikCentralSyncMessage
+            ? `\n\nHikCentral (${resultadoEdicao.hikCentralSyncStatus}): ${resultadoEdicao.hikCentralSyncMessage}`
+            : "";
+        alert(`Cadastro atualizado localmente.${situacao}`);
         window.fecharModalEditar();
         executarFiltroAtual();
     });

@@ -16,5 +16,6 @@ public record AssistidoRequest(
     @Size(max = 30) String rg,
     @Size(max = 100) String cidadeNascimento,
     Sexo sexo,
-    @NotBlank String codigoAssistido
+    @NotBlank String codigoAssistido,
+    @Size(max = 2800000) String fotoBase64
 ) {}

@@ -20,14 +20,21 @@ public record AssistidoResponse(
     Sexo sexo,
     StatusAssistido status,
     LocalDateTime dataCadastro,
-    LocalDateTime dataAtualizacao
+    LocalDateTime dataAtualizacao,
+    String hikCentralSyncStatus,
+    String hikCentralSyncMessage
 ) {
     public static AssistidoResponse from(Assistido a) {
         return new AssistidoResponse(
             a.getId(), a.getCodigoAssistido(), a.getNome(),
             a.getDataNascimento(), a.getNomeMae(), a.getNomePai(),
             a.getCpf(), a.getRg(), a.getCidadeNascimento(),
-            a.getSexo(), a.getStatus(), a.getDataCadastro(), a.getDataAtualizacao()
+            a.getSexo(), a.getStatus(), a.getDataCadastro(), a.getDataAtualizacao(), null, null
         );
+    }
+
+    public AssistidoResponse comIntegracao(String estado, String mensagem) {
+        return new AssistidoResponse(id, codigoAssistido, nome, dataNascimento, nomeMae, nomePai,
+                cpf, rg, cidadeNascimento, sexo, status, dataCadastro, dataAtualizacao, estado, mensagem);
     }
 }
