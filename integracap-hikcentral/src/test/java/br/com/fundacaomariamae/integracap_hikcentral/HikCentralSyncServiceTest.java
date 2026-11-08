@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 
 class HikCentralSyncServiceTest {
 
@@ -85,4 +88,52 @@ class HikCentralSyncServiceTest {
         assertEquals("DESABILITADA", resposta.hikCentralSyncStatus());
         verifyNoInteractions(preparacao, openApi);
     }
+
+    @Test
+    void deveRetornarFalhaQuandoFotoForInvalida() {
+        configuracao.setEnabled(true);
+        configuracao.setOrgIndexCode("ORG-TESTE");
+
+        AssistidoResponse resposta =
+                service.sincronizarNovoCadastro(
+                        criarAssistido(), "FOTO-INVALIDA%%%");
+
+        assertEquals("FALHA", resposta.hikCentralSyncStatus());
+        verifyNoInteractions(preparacao, openApi);
+    }
+
+    @Test
+    void deveInformarFaltaDeOrganizacaoNaEdicao() {
+        configuracao.setEnabled(true);
+
+        AssistidoResponse resposta =
+                service.sincronizarEdicao(criarAssistido());
+
+        assertEquals(
+                "FALHA_CONFIGURACAO",
+                resposta.hikCentralSyncStatus()
+        );
+
+        verifyNoInteractions(preparacao, openApi);
+    }
+
+    @Test
+    void deveTratarFalhaDaApiDuranteEdicao() {
+        configuracao.setEnabled(true);
+        configuracao.setOrgIndexCode("ORG-TESTE");
+
+        doThrow(new IllegalStateException("Falha simulada na API"))
+                .when(openApi)
+                .atualizarPessoaExistente(
+                        eq("TESTE-001"),
+                        anyMap()
+                );
+
+        AssistidoResponse resposta =
+                service.sincronizarEdicao(criarAssistido());
+
+        assertEquals("FALHA", resposta.hikCentralSyncStatus());
+        verifyNoInteractions(preparacao);
+    }
+
 }
