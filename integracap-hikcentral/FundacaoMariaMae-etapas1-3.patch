@@ -1,0 +1,320 @@
+diff --git a/integracap-hikcentral/README.md b/integracap-hikcentral/README.md
+index 01075bd..c6fddfc 100644
+--- a/integracap-hikcentral/README.md
++++ b/integracap-hikcentral/README.md
+@@ -135,9 +135,19 @@ src/test/java/            Testes automatizados
+ 
+ O banco fica em `data/fundacao_maria_mae.sqlite`, relativo à pasta de execução. Inicie sempre o projeto na pasta correta. É necessário acesso de escrita para cadastrar e registrar tentativas.
+ 
+-O JPA está configurado com `ddl-auto=none`: não cria nem altera automaticamente as tabelas de cadastro. A integração cria somente sua tabela `integracao_preparacao` e seu índice no primeiro uso. Não substitua o arquivo do banco ao atualizar apenas o código de um ambiente já utilizado.
++O JPA está configurado com `ddl-auto=none`: não cria nem altera automaticamente as tabelas de cadastro. A integração cria a tabela `integracao_preparacao` e seu índice no primeiro uso, mas isso não substitui as migrações que adicionam restrições às tabelas já existentes. Não substitua o arquivo do banco ao atualizar apenas o código de um ambiente já utilizado.
+ 
+-Conversores explícitos permitem ler datas ISO e datas antigas em milissegundos no SQLite. Novos nascimentos são gravados em texto ISO; datas numéricas são interpretadas em UTC. A consulta de duplicidade compara nome e nascimento nos formatos antigos e novos, mantendo a regra existente. Não houve migração dos registros.
++### Aplicar migrações SQLite
++
++Antes de qualquer alteração, feche a aplicação e faça uma cópia de `data/fundacao_maria_mae.sqlite`. As migrações são scripts SQL manuais, não são executadas automaticamente pelo Spring. No DB Browser for SQLite, abra o banco, vá à aba **Executar SQL** e execute, nesta ordem:
++
++1. `database/migrations/V2__integracao_preparacao_fk.sql` — adiciona a chave estrangeira de `integracao_preparacao.assistido_id` para `assistido.id`. Execute somente uma vez em cada banco que ainda não tenha essa chave.
++2. `database/migrations/V3__indices_relacionamentos.sql` — cria o índice de `documento.atendimento_id`.
++3. `database/migrations/V4__validacoes_assistido.sql` — cria validações para nome, código, nascimento e CPF em inserções e atualizações diretas no SQLite.
++
++V3 e V4 usam `IF NOT EXISTS` e podem ser reexecutadas. V2 reconstrói a tabela e não deve ser executada novamente após aplicada. Ao final, execute `PRAGMA foreign_key_check;` e `PRAGMA integrity_check;`; o primeiro deve retornar zero linhas e o segundo deve retornar `ok`. A aplicação também ativa `PRAGMA foreign_keys=ON` em cada conexão do pool.
++
++Conversores explícitos permitem ler datas ISO e datas antigas em milissegundos no SQLite. Novos nascimentos são gravados em texto ISO; datas numéricas são interpretadas em UTC. A API rejeita nascimento futuro e a migração V4 impede datas vazias, inválidas ou futuras no banco. O CPF é opcional, mas, quando informado, deve ser armazenado com 11 dígitos numéricos; o serviço remove a pontuação antes de salvar. A consulta de duplicidade compara nome e nascimento nos formatos antigos e novos, mantendo a regra existente. As migrações preservam os registros existentes.
+ 
+ As propriedades estão em `src/main/resources/application.properties`. O serviço de imagens aceita até 2 MiB e 16 milhões de pixels por padrão, configuráveis em `hikcentral.preparacao.max-foto-bytes` e `hikcentral.preparacao.max-pixels`. O limite HTTP atual é menor; a interface usa 1 MB para acompanhá-lo. Esses são limites locais, não requisitos confirmados da Hikvision.
+ 
+diff --git a/integracap-hikcentral/database/migrations/V2__integracao_preparacao_fk.sql b/integracap-hikcentral/database/migrations/V2__integracao_preparacao_fk.sql
+new file mode 100644
+index 0000000..a0039e5
+--- /dev/null
++++ b/integracap-hikcentral/database/migrations/V2__integracao_preparacao_fk.sql
+@@ -0,0 +1,42 @@
++-- Faça uma cópia de segurança de data/fundacao_maria_mae.sqlite antes de executar.
++-- Esta migração preserva os registros existentes e adiciona a FK para assistido(id).
++-- Execute o arquivo inteiro em uma ferramenta SQLite (ex.: DB Browser for SQLite).
++
++PRAGMA foreign_keys = OFF;
++BEGIN TRANSACTION;
++
++CREATE TABLE integracao_preparacao_nova (
++    id TEXT PRIMARY KEY,
++    assistido_id INTEGER NOT NULL,
++    finalidade TEXT NOT NULL,
++    estado TEXT NOT NULL CHECK (estado IN ('EM_PREPARACAO','PREPARADO_LOCALMENTE','FALHA_PREPARACAO')),
++    http_status INTEGER,
++    codigo_erro TEXT,
++    mensagem TEXT,
++    foto_sha256 TEXT,
++    criado_em TEXT NOT NULL,
++    atualizado_em TEXT NOT NULL,
++    FOREIGN KEY (assistido_id) REFERENCES assistido(id)
++        ON UPDATE CASCADE ON DELETE RESTRICT
++);
++
++INSERT INTO integracao_preparacao_nova (
++    id, assistido_id, finalidade, estado, http_status, codigo_erro,
++    mensagem, foto_sha256, criado_em, atualizado_em
++)
++SELECT
++    id, assistido_id, finalidade, estado, http_status, codigo_erro,
++    mensagem, foto_sha256, criado_em, atualizado_em
++FROM integracao_preparacao;
++
++DROP TABLE integracao_preparacao;
++ALTER TABLE integracao_preparacao_nova RENAME TO integracao_preparacao;
++
++CREATE INDEX IF NOT EXISTS idx_integracao_preparacao_assistido
++    ON integracao_preparacao(assistido_id, criado_em);
++
++COMMIT;
++PRAGMA foreign_keys = ON;
++
++-- O resultado deve ser vazio. Se retornar linhas, há registros inconsistentes.
++PRAGMA foreign_key_check;
+diff --git a/integracap-hikcentral/database/migrations/V3__indices_relacionamentos.sql b/integracap-hikcentral/database/migrations/V3__indices_relacionamentos.sql
+new file mode 100644
+index 0000000..b5484a0
+--- /dev/null
++++ b/integracap-hikcentral/database/migrations/V3__indices_relacionamentos.sql
+@@ -0,0 +1,8 @@
++-- Índices para colunas usadas como chaves estrangeiras e filtros frequentes.
++-- Execute após V2. A criação IF NOT EXISTS é segura para reexecução.
++CREATE INDEX IF NOT EXISTS idx_documento_atendimento
++    ON documento(atendimento_id);
++
++-- Verificações finais: ambas devem retornar zero linhas/valor 0.
++PRAGMA foreign_key_check;
++PRAGMA integrity_check;
+diff --git a/integracap-hikcentral/database/migrations/V4__validacoes_assistido.sql b/integracap-hikcentral/database/migrations/V4__validacoes_assistido.sql
+new file mode 100644
+index 0000000..d69d30e
+--- /dev/null
++++ b/integracap-hikcentral/database/migrations/V4__validacoes_assistido.sql
+@@ -0,0 +1,103 @@
++-- Validações adicionais para impedir dados cadastrais inconsistentes.
++-- Execute após V2 e V3, sempre com backup do banco.
++-- Mantém compatibilidade com datas ISO (AAAA-MM-DD) e timestamps Unix em milissegundos.
++
++CREATE TRIGGER IF NOT EXISTS trg_assistido_validar_insert
++BEFORE INSERT ON assistido
++BEGIN
++    SELECT CASE
++        WHEN NEW.codigo_assistido IS NULL OR trim(NEW.codigo_assistido) = ''
++        THEN RAISE(ABORT, 'Código do assistido é obrigatório.')
++    END;
++
++    SELECT CASE
++        WHEN NEW.nome IS NULL OR trim(NEW.nome) = ''
++        THEN RAISE(ABORT, 'Nome do assistido é obrigatório.')
++    END;
++
++    SELECT CASE
++        WHEN NEW.data_nascimento IS NULL OR trim(NEW.data_nascimento) = ''
++          OR (
++              CASE
++                  WHEN trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*'
++                   AND length(trim(NEW.data_nascimento)) IN (12, 13)
++                  THEN date(CAST(trim(NEW.data_nascimento) AS INTEGER) / 1000, 'unixepoch')
++                  WHEN trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*'
++                  THEN NULL
++                  ELSE date(julianday(trim(NEW.data_nascimento)))
++              END
++          ) IS NULL
++          OR (
++              CASE
++                  WHEN trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*'
++                  THEN date(CAST(trim(NEW.data_nascimento) AS INTEGER) / 1000, 'unixepoch')
++                  ELSE date(julianday(trim(NEW.data_nascimento)))
++              END
++          ) > date('now')
++          OR (
++              NOT (trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*')
++              AND date(julianday(trim(NEW.data_nascimento))) <> substr(trim(NEW.data_nascimento), 1, 10)
++          )
++        THEN RAISE(ABORT, 'Data de nascimento inválida ou futura.')
++    END;
++
++    SELECT CASE
++        WHEN NEW.cpf IS NOT NULL
++         AND (trim(NEW.cpf) = '' OR length(NEW.cpf) <> 11 OR NEW.cpf GLOB '*[^0-9]*')
++        THEN RAISE(ABORT, 'CPF deve conter exatamente 11 dígitos numéricos.')
++    END;
++END;
++
++CREATE TRIGGER IF NOT EXISTS trg_assistido_validar_update
++BEFORE UPDATE OF codigo_assistido, nome, data_nascimento, cpf ON assistido
++BEGIN
++    SELECT CASE
++        WHEN NEW.codigo_assistido IS NULL OR trim(NEW.codigo_assistido) = ''
++        THEN RAISE(ABORT, 'Código do assistido é obrigatório.')
++    END;
++
++    SELECT CASE
++        WHEN NEW.nome IS NULL OR trim(NEW.nome) = ''
++        THEN RAISE(ABORT, 'Nome do assistido é obrigatório.')
++    END;
++
++    SELECT CASE
++        WHEN NEW.data_nascimento IS NULL OR trim(NEW.data_nascimento) = ''
++          OR (
++              CASE
++                  WHEN trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*'
++                   AND length(trim(NEW.data_nascimento)) IN (12, 13)
++                  THEN date(CAST(trim(NEW.data_nascimento) AS INTEGER) / 1000, 'unixepoch')
++                  WHEN trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*'
++                  THEN NULL
++                  ELSE date(julianday(trim(NEW.data_nascimento)))
++              END
++          ) IS NULL
++          OR (
++              CASE
++                  WHEN trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*'
++                  THEN date(CAST(trim(NEW.data_nascimento) AS INTEGER) / 1000, 'unixepoch')
++                  ELSE date(julianday(trim(NEW.data_nascimento)))
++              END
++          ) > date('now')
++          OR (
++              NOT (trim(NEW.data_nascimento) GLOB '[0-9]*'
++                   AND trim(NEW.data_nascimento) NOT GLOB '*[^0-9]*')
++              AND date(julianday(trim(NEW.data_nascimento))) <> substr(trim(NEW.data_nascimento), 1, 10)
++          )
++        THEN RAISE(ABORT, 'Data de nascimento inválida ou futura.')
++    END;
++
++    SELECT CASE
++        WHEN NEW.cpf IS NOT NULL
++         AND (trim(NEW.cpf) = '' OR length(NEW.cpf) <> 11 OR NEW.cpf GLOB '*[^0-9]*')
++        THEN RAISE(ABORT, 'CPF deve conter exatamente 11 dígitos numéricos.')
++    END;
++END;
+diff --git a/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/dto/AssistidoRequest.java b/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/dto/AssistidoRequest.java
+index a4b4525..f422ebe 100644
+--- a/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/dto/AssistidoRequest.java
++++ b/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/dto/AssistidoRequest.java
+@@ -5,14 +5,16 @@ import br.com.fundacaomariamae.integracap_hikcentral.model.Sexo;
+ import jakarta.validation.constraints.NotBlank;
+ import jakarta.validation.constraints.NotNull;
+ import jakarta.validation.constraints.Size;
++import jakarta.validation.constraints.Pattern;
++import jakarta.validation.constraints.PastOrPresent;
+ import java.time.LocalDate;
+ 
+ public record AssistidoRequest(
+     @NotBlank @Size(max = 150) String nome,
+-    @NotNull LocalDate dataNascimento,
++    @NotNull @PastOrPresent(message = "Data de nascimento não pode ser futura.") LocalDate dataNascimento,
+     @Size(max = 150) String nomeMae,
+     @Size(max = 150) String nomePai,
+-    @Size(min = 11, max = 11) String cpf,
++    @Pattern(regexp = "^(?:\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2})$", message = "CPF deve conter 11 dígitos, com ou sem pontuação.") String cpf,
+     @Size(max = 30) String rg,
+     @Size(max = 100) String cidadeNascimento,
+     Sexo sexo,
+diff --git a/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/AssistidoService.java b/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/AssistidoService.java
+index 48c972b..7be7e15 100644
+--- a/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/AssistidoService.java
++++ b/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/AssistidoService.java
+@@ -26,8 +26,8 @@ public class AssistidoService {
+         if (repository.findByCodigoAssistido(request.codigoAssistido()).isPresent()) {
+             throw new ResponseStatusException(HttpStatus.CONFLICT, "Código do assistido já cadastrado.");
+         }
+-        if (request.cpf() != null && !request.cpf().isBlank()
+-                && repository.findByCpf(request.cpf()).isPresent()) {
++        String cpfNormalizado = normalizarCpf(request.cpf());
++        if (cpfNormalizado != null && repository.findByCpf(cpfNormalizado).isPresent()) {
+             throw new ResponseStatusException(HttpStatus.CONFLICT, "CPF já cadastrado.");
+         }
+         if (repository.existsByNomeIgnoreCaseAndDataNascimento(
+@@ -42,7 +42,7 @@ public class AssistidoService {
+         a.setDataNascimento(request.dataNascimento());
+         a.setNomeMae(request.nomeMae());
+         a.setNomePai(request.nomePai());
+-        a.setCpf(normalizarCpf(request.cpf()));
++        a.setCpf(cpfNormalizado);
+         a.setRg(request.rg());
+         a.setCidadeNascimento(request.cidadeNascimento());
+         a.setSexo(request.sexo());
+@@ -75,8 +75,9 @@ public class AssistidoService {
+                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Código do assistido já pertence a outro cadastro.");
+             }
+         });
+-        if (request.cpf() != null && !request.cpf().isBlank()) {
+-            repository.findByCpf(request.cpf()).ifPresent(outro -> {
++        String cpfNormalizado = normalizarCpf(request.cpf());
++        if (cpfNormalizado != null) {
++            repository.findByCpf(cpfNormalizado).ifPresent(outro -> {
+                 if (!outro.getId().equals(id)) {
+                     throw new ResponseStatusException(HttpStatus.CONFLICT, "CPF já pertence a outro cadastro.");
+                 }
+@@ -88,7 +89,7 @@ public class AssistidoService {
+         a.setDataNascimento(request.dataNascimento());
+         a.setNomeMae(request.nomeMae());
+         a.setNomePai(request.nomePai());
+-        a.setCpf(request.cpf());
++        a.setCpf(cpfNormalizado);
+         a.setRg(request.rg());
+         a.setCidadeNascimento(request.cidadeNascimento());
+         a.setSexo(request.sexo());
+@@ -107,6 +108,6 @@ private String normalizarCpf(String cpf) {
+         return null;
+     }
+ 
+-    return cpf.replaceAll("\\D", "");
++    return cpf.trim().replaceAll("\\D", "");
+ }
+ }
+diff --git a/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/HistoricoPreparacaoService.java b/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/HistoricoPreparacaoService.java
+index 58066b8..857ddc1 100644
+--- a/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/HistoricoPreparacaoService.java
++++ b/integracap-hikcentral/src/main/java/br/com/fundacaomariamae/integracap_hikcentral/service/HistoricoPreparacaoService.java
+@@ -31,7 +31,9 @@ public class HistoricoPreparacaoService {
+                     mensagem TEXT,
+                     foto_sha256 TEXT,
+                     criado_em TEXT NOT NULL,
+-                    atualizado_em TEXT NOT NULL
++                    atualizado_em TEXT NOT NULL,
++                    FOREIGN KEY (assistido_id) REFERENCES assistido(id)
++                        ON UPDATE CASCADE ON DELETE RESTRICT
+                 )
+                 """);
+         jdbc.execute("CREATE INDEX IF NOT EXISTS idx_integracao_preparacao_assistido ON integracao_preparacao(assistido_id, criado_em)");
+diff --git a/integracap-hikcentral/src/main/resources/application.properties b/integracap-hikcentral/src/main/resources/application.properties
+index d06df80..da10381 100644
+--- a/integracap-hikcentral/src/main/resources/application.properties
++++ b/integracap-hikcentral/src/main/resources/application.properties
+@@ -3,6 +3,8 @@ server.port=8081
+ # Banco SQLite do cadastro de assistidos (arquivo em ./data na raiz do projeto)
+ spring.datasource.url=jdbc:sqlite:./data/fundacao_maria_mae.sqlite
+ spring.datasource.driver-class-name=org.sqlite.JDBC
++# Ativa a verificacao de chaves estrangeiras em cada conexao SQLite do pool.
++spring.datasource.hikari.connection-init-sql=PRAGMA foreign_keys=ON
+ spring.jpa.properties.hibernate.dialect=org.hibernate.community.dialect.SQLiteDialect
+ spring.jpa.hibernate.ddl-auto=none
+ spring.jpa.open-in-view=false
+diff --git a/integracap-hikcentral/src/test/java/br/com/fundacaomariamae/integracap_hikcentral/PreparacaoAssistidoSalvoTests.java b/integracap-hikcentral/src/test/java/br/com/fundacaomariamae/integracap_hikcentral/PreparacaoAssistidoSalvoTests.java
+index b16cc74..a7b0541 100644
+--- a/integracap-hikcentral/src/test/java/br/com/fundacaomariamae/integracap_hikcentral/PreparacaoAssistidoSalvoTests.java
++++ b/integracap-hikcentral/src/test/java/br/com/fundacaomariamae/integracap_hikcentral/PreparacaoAssistidoSalvoTests.java
+@@ -219,6 +219,14 @@ class PreparacaoAssistidoSalvoTests {
+             }
+         }
+     }
++    @Test void rejeitaDataNascimentoFutura() throws Exception {
++        String corpo = """
++                {"codigoAssistido":"DATA-FUTURA","nome":"Pessoa Ficticia Futura",
++                 "dataNascimento":"2999-01-01","cpf":null}
++                """;
++        assertEquals(400, json("POST", "", corpo).statusCode());
++    }
++
+     @Test void cadastroInexistenteRetorna404() throws Exception {
+         assertEquals(404, chamar("assistidos/999/preparar", "ORG-TESTE", foto(), null).statusCode());
+     }
